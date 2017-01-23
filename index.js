@@ -1,66 +1,35 @@
-import React, { Component, PropTypes } from 'react'
-import ReactDOM from 'react-dom'
-import { createStore } from 'redux'
-import { Provider, connect } from 'react-redux'
-
-// React component
-class Counter extends Component {
-  render() {
-    const { value, onIncreaseClick } = this.props
-    return (
-      <div>
-        <span>{value}</span>
-        <button onClick={onIncreaseClick}>Increase</button>
-      </div>
-    )
-  }
-}
-
-Counter.propTypes = {
-  value: PropTypes.number.isRequired,
-  onIncreaseClick: PropTypes.func.isRequired
-}
-
-// Action
-const increaseAction = { type: 'increase' }
+import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import Counter from './app/counter.js';
 
 // Reducer
-function counter(state = { count: 0 }, action) {
-  const count = state.count
+function counter(state = { name: 'Count', count: 0, renaming: false }, action) {
+  const count = state.count,
+        name = state.name,
+        renaming = state.renaming;
+
   switch (action.type) {
     case 'increase':
-      return { count: count + 1 }
+      return { name: name, count: count + 1, renaming: renaming };
+    case 'reset':
+      return { name: name, count: 0, renaming: renaming };
+    case 'renameStart':
+      return { name: name, count: count, renaming: true };
+    case 'renameEnd':
+      return { name: action.name, count: count, renaming: false};
     default:
-      return state
+      return state;
   }
-}
+};
 
 // Store
-const store = createStore(counter)
-
-// Map Redux state to component props
-function mapStateToProps(state) {
-  return {
-    value: state.count
-  }
-}
-
-// Map Redux actions to component props
-function mapDispatchToProps(dispatch) {
-  return {
-    onIncreaseClick: () => dispatch(increaseAction)
-  }
-}
-
-// Connected Component
-const App = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Counter)
+const store = createStore(counter);
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <Counter />
   </Provider>,
   document.getElementById('root')
-)
+);
